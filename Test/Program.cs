@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -69,13 +69,22 @@ namespace Test
                     Trace.WriteLine("MTU:" + nii->Mtu);
                     Trace.WriteLine("Type:" + (NetworkInterfaceType) nii->HardwareType);
                     Trace.WriteLine("Speed:" + (OperationalStatus) nii->OperationalState);                    
-                    Trace.WriteLine("Multicast" + nii->SupportsMulticast);
+                    Trace.WriteLine("Multicast:" + nii->SupportsMulticast);
                     if (nii->NumAddressBytes > 0)
                     {
-                        Trace.WriteLine("Addr Bytes " + new PhysicalAddress(new ReadOnlySpan<byte>(nii->AddressBytes, nii->NumAddressBytes).ToArray()));
+                        Trace.WriteLine("Number of Bytes:" + nii->NumAddressBytes);
+                        var rospan = new ReadOnlySpan<byte>(nii->AddressBytes, nii->NumAddressBytes);
+                        Trace.WriteLine("Addr Bytes " + new PhysicalAddress(rospan.ToArray()).ToString());
+                        foreach (var bit in rospan)
+                        {
+                            Trace.Write(bit.ToString());
+                            Trace.Write(",");
+                        }
+                        Trace.WriteLine("");
                     }
-                    Trace.WriteLine("Addr Bytes: " + new ReadOnlySpan<byte>(ai->AddressBytes, ai->NumAddressBytes).ToString());
                 }
+
+                nii++;
             }
             finally
             {
