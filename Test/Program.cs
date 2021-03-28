@@ -74,17 +74,42 @@ namespace Test
                     {
                         Trace.WriteLine("Number of Bytes:" + nii->NumAddressBytes);
                         var rospan = new ReadOnlySpan<byte>(nii->AddressBytes, nii->NumAddressBytes);
-                        Trace.WriteLine("Addr Bytes " + new PhysicalAddress(rospan.ToArray()).ToString());
+                        Trace.WriteLine("Physical Address:" + new PhysicalAddress(rospan.ToArray()).ToString());
                         foreach (var bit in rospan)
                         {
-                            Trace.Write(bit.ToString());
-                            Trace.Write(",");
+                            Trace.Write(bit.ToString());                            
                         }
                         Trace.WriteLine("");
                     }
+
+                    nii++;
                 }
 
-                nii++;
+                while (addressCount != 0)
+                {
+                    var rospan = new ReadOnlySpan<byte>(ai->AddressBytes, ai->NumAddressBytes);
+                    try
+                    {
+                        var address = new IPAddress(rospan);
+                        Trace.WriteLine(address.ToString());
+                        if (address.IsIPv6LinkLocal)
+                        {
+                            Trace.WriteLine("Scopeid: " + ai->InterfaceIndex.ToString());
+                        }
+
+                        Trace.WriteLine("PrefixLength:" + ai->PrefixLength.ToString());
+                    }
+                    catch
+                    {
+                        Trace.WriteLine("Error parsing IP");
+                        Trace.WriteLine(rospan.ToString());
+                        Trace.WriteLine("Scopeid: " + ai->InterfaceIndex.ToString());
+                        Trace.WriteLine("PrefixLength:" + ai->PrefixLength.ToString());
+                    }
+
+                    ai++;
+                    addressCount--;
+                }
             }
             finally
             {
